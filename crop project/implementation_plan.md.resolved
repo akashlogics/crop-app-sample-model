@@ -1,0 +1,72 @@
+# CropAI: Crop Selection + 4-Day Water Schedule
+
+## Summary
+
+After the user hits **Analyse & Recommend**, they currently see the best crop + 4 related crops. We will:
+1. **Add a "Select Crop to Grow" section** below the results — best crop pre-selected, all 5 shown with a clear "Select" button per crop.
+2. **Save the selected crop** into the DB history via a new `/select-crop` API endpoint.
+3. **Show the selected crop in the Weather page** in a fixed panel below the forecast, with a **4-day water schedule** (date + litres per plant per day) derived from forecast data.
+4. After day 4, the schedule shows a note: *"Call back after Day 4 for updated schedule."*
+
+---
+
+## Proposed Changes
+
+### Backend — [app.py](file:///d:/crop%20project/backend/app.py)
+
+#### [MODIFY] [app.py](file:///d:/crop%20project/backend/app.py)
+- Add `CROP_WATER_NEEDS` dict: daily water requirement (litres/plant) for every crop in dry/normal/rainy conditions.
+- Add `/select-crop` POST endpoint: receives `{ history_id, selected_crop }` and updates the DB record.
+- Add `/water-schedule` GET endpoint: receives `city` + `crop`, calls the `/forecast` data internally, and returns an array of 4 objects `{ date, day, rainfall_mm, recommended_water_L, note }`.
+
+#### [MODIFY] [database.py](file:///d:/crop%20project/backend/database.py)
+- Add `selected_crop` column to `recommendations` table (if not exists migration).
+- Add `update_selected_crop(history_id, crop)` function.
+
+---
+
+### Frontend HTML — [index.html](file:///d:/crop%20project/frontend/index.html)
+
+#### [MODIFY] [index.html](file:///d:/crop%20project/frontend/index.html)
+- Inside `#resultsSection`, after the results grid and advisory, add:
+  - **"🌱 Choose a Crop to Grow"** section with a styled selector card for each recommendation (top + 4 related = 5 total). Clicking one highlights it and triggers `selectCropToGrow(crop, historyId)`.
+- Inside the Weather page (`#page-weather`), after the advisory card, add:
+  - **"💧 4-Day Water Schedule"** panel (`id="waterSchedulePanel"` — hidden by default, shown when a crop is selected).
+
+---
+
+### Frontend JS — [app.js](file:///d:/crop%20project/frontend/js/app.js)
+
+#### [MODIFY] [app.js](file:///d:/crop%20project/frontend/js/app.js)
+- [renderResults(data)](file:///d:/crop%20project/frontend/js/app.js#234-287): store returned `history_id` in a module-level variable; render a **Crop Selector** section below the results with all 5 crops labeled "✨ Best Match" or "🌿 Related".
+- `selectCropToGrow(crop, historyId)`:
+  - POST to `/select-crop`.
+  - Store selection in `localStorage` (`cropai_selected_crop`).
+  - Update the weather page panel by calling `loadWaterSchedule(city, crop)`.
+  - Show a toast "✅ {Crop} selected for planting!".
+- `loadWaterSchedule(city, crop)`: GET `/water-schedule?city=...&crop=...`, render 4 day cards in `#waterSchedulePanel`.
+- History cards: show **"Selected to grow: {crop}"** tag if `selected_crop` field present.
+
+---
+
+### Frontend CSS — [style.css](file:///d:/crop%20project/frontend/css/style.css)
+
+#### [MODIFY] [style.css](file:///d:/crop%20project/frontend/css/style.css)
+- `.crop-selector-section` — container below results.
+- `.crop-select-card` — card per crop, hover glow, `.active` state with green border.
+- `.water-schedule-panel` — weather page panel with day cards.
+- `.ws-day-card` — individual day card with date, icon, water amount.
+
+---
+
+## Verification Plan
+
+### Manual Verification (Browser)
+
+1. Start backend: run `python app.py` in `d:\crop project\backend`.
+2. Open `d:\crop project\frontend\index.html` in a browser.
+3. Go to **Recommend** page → fill location + soil type → click **Analyse & Recommend**.
+4. Verify the crop selector section appears below results, showing 5 crops (1 best + 4 related).
+5. Click **"Select"** on any crop — verify it highlights green and a toast appears.
+6. Navigate to **Weather** page — verify the **4-Day Water Schedule** panel appears with 4 date cards showing `recommended_water_L` values.
+7. Go to **History** page — verify the chosen crop appears as a tag on the latest history card.

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🌱 CropAI — Smart Crop Recommendation</title>
+  <meta name="description"
+    content="AI-powered crop recommendation system using Random Forest to help farmers choose the best crops based on soil and weather conditions." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+
+  <!-- ══ DESKTOP TOP NAVBAR (hidden on mobile) ══════════════════════════════ -->
+  <header class="desktop-header">
+    <div class="desktop-header-inner">
+      <div class="dh-brand">
+        <span>🌱</span>
+        <span class="dh-brand-name">CropAI</span>
+      </div>
+      <nav class="dh-nav">
+        <button class="dh-nav-btn active" id="dh-home"     onclick="showPage('home', this)">🏠 Home</button>
+        <button class="dh-nav-btn"        id="dh-recommend" onclick="showPage('recommend', this)">🌾 Recommend</button>
+        <button class="dh-nav-btn"        id="dh-weather"   onclick="showPage('weather', this)">⛅ Weather</button>
+        <button class="dh-nav-btn"        id="dh-history"   onclick="showPage('history', this)">📜 History</button>
+      </nav>
+      <div class="dh-status">
+        <span class="status-dot"></span> System Online
+      </div>
+    </div>
+  </header>
+
+  <!-- ══ APP SHELL ══════════════════════════════════════════════════════════ -->
+  <div class="app-shell">
+
+    <!-- ════ PAGE: HOME ═══════════════════════════════════════════════════ -->
+    <div id="page-home" class="page active">
+
+      <!-- Mobile header -->
+      <div class="page-header mobile-only">
+        <h1 class="page-title">🌱 CropAI</h1>
+        <span class="header-badge">
+          <span class="status-dot"></span> Online
+        </span>
+      </div>
+
+      <div class="home-layout">
+        <div class="hero-block">
+          <div class="hero-tag">Powered by Random Forest AI</div>
+          <h2 class="hero-heading">Smart Crop<br /><span class="gradient-text">Recommendations</span></h2>
+          <p class="hero-sub">Get instant AI-driven crop advice based on your soil & local weather.</p>
+
+          <div class="stats-row">
+            <div class="stat-pill"><span class="stat-n">22+</span><span class="stat-l">Crop Types</span></div>
+            <div class="stat-pill"><span class="stat-n">99%</span><span class="stat-l">Accuracy</span></div>
+            <div class="stat-pill"><span class="stat-n">Real-time</span><span class="stat-l">Weather</span></div>
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <button class="action-card" onclick="showPage('recommend', null)">
+            <span class="action-icon">🌾</span>
+            <span class="action-label">Get Crop Recommendation</span>
+            <span class="action-arrow">›</span>
+          </button>
+          <button class="action-card" onclick="showPage('weather', null)">
+            <span class="action-icon">🌤️</span>
+            <span class="action-label">View Live Weather</span>
+            <span class="action-arrow">›</span>
+          </button>
+          <button class="action-card" onclick="showPage('history', null)">
+            <span class="action-icon">📜</span>
+            <span class="action-label">Past Recommendations</span>
+            <span class="action-arrow">›</span>
+          </button>
+          <button class="action-card" onclick="showPage('history', null)">
+            <span class="action-icon">📊</span>
+            <span class="action-label">AI Model Insights</span>
+            <span class="action-arrow">›</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ PAGE: RECOMMEND ═══════════════════════════════════════════════ -->
+    <div id="page-recommend" class="page">
+
+      <!-- Mobile page header -->
+      <div class="page-header mobile-only">
+        <div>
+          <h1 class="page-title">Land Details 🗺️</h1>
+          <p class="page-subtitle">Tell us about your farm for accurate recommendations</p>
+        </div>
+      </div>
+
+      <!-- Desktop page heading -->
+      <div class="desktop-page-heading desktop-only">
+        <h2 class="desk-page-title">Land Details 🗺️</h2>
+        <p class="desk-page-sub">Tell us about your farm for accurate recommendations</p>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="progress-wrap">
+        <div class="progress-label">
+          <span>Details filled</span>
+          <span id="progressText" class="progress-count">0/2 required</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+        </div>
+      </div>
+
+      <!-- Two-column layout on desktop -->
+      <div class="recommend-layout">
+
+        <!-- LEFT: Input form -->
+        <div class="recommend-left">
+          <form id="recommendForm" class="land-form">
+
+            <!-- Location -->
+            <div class="field-group">
+              <div class="field-label-row">
+                <label class="field-label">Location <span class="required-star">*</span></label>
+                <span class="auto-fetch-hint">Weather loads automatically</span>
+              </div>
+              <div class="location-input-box">
+                <span class="field-icon">📍</span>
+                <input type="text" id="location" placeholder="Enter city or district" class="location-input"
+                  oninput="updateProgress()"
+                  onblur="if(this.value.trim()) fetchWeather(this.value.trim())"
+                  onkeydown="if(event.key==='Enter'){event.preventDefault(); if(this.value.trim()) fetchWeather(this.value.trim())}" />
+              </div>
+            </div>
+
+            <!-- Soil Type -->
+            <div class="field-group">
+              <label class="field-label">Soil Type <span class="required-star">*</span></label>
+              <div class="select-box" id="soilBox" onclick="toggleDropdown('soilDropdown', this)">
+                <span class="select-icon">＋</span>
+                <span class="select-placeholder" id="soilPlaceholder">Select soil type</span>
+                <span class="select-chevron" id="soilChevron">⌄</span>
+              </div>
+              <div class="dropdown-menu hidden" id="soilDropdown">
+                <div class="dropdown-item" onclick="selectSoil('Alluvial Soil',   90, 55, 40, 7.0)">🟤 Alluvial Soil</div>
+                <div class="dropdown-item" onclick="selectSoil('Black Soil',      48, 24, 50, 7.8)">⬛ Black Soil (Cotton)</div>
+                <div class="dropdown-item" onclick="selectSoil('Red Soil',        20, 15, 20, 6.0)">🔴 Red Soil</div>
+                <div class="dropdown-item" onclick="selectSoil('Laterite Soil',   10, 10, 15, 5.5)">🟠 Laterite Soil</div>
+                <div class="dropdown-item" onclick="selectSoil('Sandy Soil',      15, 12, 25, 6.2)">🟡 Sandy Soil</div>
+                <div class="dropdown-item" onclick="selectSoil('Loamy Soil',      60, 45, 43, 6.8)">🟫 Loamy Soil</div>
+                <div class="dropdown-item" onclick="selectSoil('Clay Soil',       40, 35, 30, 7.2)">🪨 Clay Soil</div>
+              </div>
+              <input type="hidden" id="soilType" />
+            </div>
+
+            <!-- NPK + pH — auto-filled, read-only display -->
+            <div class="field-group" id="npkSection" style="display:none">
+              <label class="field-label">🌍 Soil Nutrients <span class="auto-tag">Auto-filled from soil type</span></label>
+              <div class="npk-grid">
+                <div class="npk-cell readonly">
+                  <label>N <span class="unit">mg/kg</span></label>
+                  <input type="number" id="N" readonly />
+                </div>
+                <div class="npk-cell readonly">
+                  <label>P <span class="unit">mg/kg</span></label>
+                  <input type="number" id="P" readonly />
+                </div>
+                <div class="npk-cell readonly">
+                  <label>K <span class="unit">mg/kg</span></label>
+                  <input type="number" id="K" readonly />
+                </div>
+                <div class="npk-cell readonly">
+                  <label>pH</label>
+                  <input type="number" id="ph" readonly />
+                </div>
+              </div>
+              <p class="auto-note">💡 These values are typical for the selected soil. You can override them if you have a soil test report.</p>
+            </div>
+
+            <!-- NPK override toggle -->
+            <div id="npkOverrideToggle" style="display:none">
+              <button type="button" class="override-btn" onclick="toggleNpkOverride()">✏️ Override soil nutrient values</button>
+            </div>
+
+            <!-- Irrigation Type (OPTIONAL) -->
+            <div class="field-group">
+              <label class="field-label field-label-optional">
+                Irrigation Type <span class="optional-tag">(optional)</span>
+              </label>
+              <div class="select-box" id="irrigBox" onclick="toggleDropdown('irrigDropdown', this)">
+                <span class="select-icon">＋</span>
+                <span class="select-placeholder" id="irrigPlaceholder">Select irrigation method</span>
+                <span class="select-chevron">⌄</span>
+              </div>
+              <div class="dropdown-menu hidden" id="irrigDropdown">
+                <div class="dropdown-item" onclick="selectIrrig('Drip Irrigation')">💧 Drip Irrigation</div>
+                <div class="dropdown-item" onclick="selectIrrig('Sprinkler Irrigation')">🌧️ Sprinkler</div>
+                <div class="dropdown-item" onclick="selectIrrig('Flood Irrigation')">🌊 Flood Irrigation</div>
+                <div class="dropdown-item" onclick="selectIrrig('Canal Irrigation')">🏞️ Canal Irrigation</div>
+                <div class="dropdown-item" onclick="selectIrrig('Rainfed (No Irrigation)')">☁️ Rainfed</div>
+              </div>
+              <input type="hidden" id="irrigType" />
+            </div>
+
+            <!-- Land Size (Optional) -->
+            <div class="field-group">
+              <label class="field-label field-label-optional">
+                Land Size <span class="optional-tag">(optional)</span>
+              </label>
+              <div class="land-input-box">
+                <span class="field-icon">📐</span>
+                <input type="number" id="landSize" placeholder="Enter land size" class="land-input" min="0" step="0.1" />
+                <span class="land-unit">acres</span>
+              </div>
+            </div>
+
+            <!-- Hidden weather fields (auto-filled from API, not shown to user) -->
+            <input type="hidden" id="temperature" />
+            <input type="hidden" id="humidity" />
+            <input type="hidden" id="rainfall" />
+
+            <!-- Weather status banner -->
+            <div class="weather-status-banner" id="weatherBanner">
+              <span class="wsb-icon" id="wsbIcon">⏳</span>
+              <div class="wsb-text">
+                <span class="wsb-title" id="wsbTitle">Weather not loaded yet</span>
+                <span class="wsb-sub" id="wsbSub">Type a location above — weather loads automatically when you finish typing</span>
+              </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="form-btns">
+              <button type="button" class="btn-load-example" onclick="fillExample()">📋 Load Example</button>
+              <button type="submit" class="btn-analyse" id="submitBtn">
+                <span class="btn-dot"></span>
+                <span class="btn-text">Analyse &amp; Recommend</span>
+                <span class="btn-loader" style="display:none">⏳ Analysing…</span>
+              </button>
+            </div>
+
+          </form>
+        </div>
+
+        <!-- RIGHT: Results (always visible on desktop, appears below on mobile) -->
+        <div class="recommend-right" id="resultsContainer">
+
+          <!-- Placeholder when no results yet -->
+          <div class="results-placeholder" id="resultsPlaceholder">
+            <div class="rp-icon">🌾</div>
+            <h3 class="rp-title">Your results will appear here</h3>
+            <p class="rp-sub">Fill in the Land Details form and click <strong>Analyse &amp; Recommend</strong></p>
+          </div>
+
+          <!-- Actual Results -->
+          <div id="resultsSection" style="display:none">
+            <div class="results-header-row">
+              <h2 class="results-title">🏆 Top Crop Recommendations</h2>
+              <p class="results-subtitle" id="resultsSubtitle">Based on your soil and weather conditions</p>
+            </div>
+
+            <!-- Top card -->
+            <div class="top-result-card" id="topResultCard">
+              <div class="top-badge">✨ Best Match</div>
+              <div class="top-emoji" id="topEmoji">🌾</div>
+              <div class="top-name" id="topCropName">—</div>
+              <div class="top-desc" id="topCropDesc">—</div>
+              <div class="conf-bar-wrap">
+                <div class="conf-bar-bg">
+                  <div class="conf-bar-fill" id="topConfBar" style="width:0%"></div>
+                </div>
+                <span class="conf-label" id="topConfLabel">0%</span>
+              </div>
+              <div class="fert-tag" id="topFertilizer">🧪 Fertilizer: —</div>
+            </div>
+
+            <!-- Other results grid -->
+            <div class="results-grid" id="resultsGrid"></div>
+
+            <!-- Farm Advisory -->
+            <div class="advisory-card" id="advisoryBox" style="display:none">
+              <h3 class="advisory-title">📋 Farm Advisory</h3>
+              <ul class="advisory-list" id="advisoryList"></ul>
+            </div>
+
+            <!-- ✅ Crop Selector -->
+            <div class="crop-selector-section" id="cropSelectorSection" style="display:none">
+              <div class="crop-selector-header">
+                <span class="crop-selector-icon">🌱</span>
+                <div>
+                  <h3 class="crop-selector-title">Choose a Crop to Grow</h3>
+                  <p class="crop-selector-sub">Select the crop you plan to grow. We'll save it and build your watering schedule.</p>
+                </div>
+              </div>
+              <div class="crop-selector-grid" id="cropSelectorGrid"></div>
+              <div class="crop-selected-banner" id="cropSelectedBanner" style="display:none">
+                <span id="cropSelectedEmoji">🌾</span>
+                <span id="cropSelectedText">Rice selected for planting!</span>
+                <button class="goto-water-btn" onclick="showPage('weather', null)">💧 View Water Schedule →</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- /recommend-layout -->
+    </div>
+
+    <!-- ════ PAGE: WEATHER ═════════════════════════════════════════════════ -->
+    <div id="page-weather" class="page">
+
+      <div class="page-header mobile-only">
+        <h1 class="page-title">Weather Details ⛅</h1>
+      </div>
+      <div class="desktop-page-heading desktop-only">
+        <h2 class="desk-page-title">Weather Details ⛅</h2>
+      </div>
+
+      <div class="weather-layout">
+        <div class="weather-left">
+          <!-- Main weather card -->
+          <div class="weather-main-card">
+            <div class="weather-location" id="weatherLocation">Enter a location to view weather</div>
+            <div class="weather-main-row">
+              <div class="weather-main-left">
+                <div class="weather-big-temp" id="weatherTemp">--°C</div>
+                <div class="weather-condition" id="weatherDesc">—</div>
+              </div>
+              <div class="weather-big-icon" id="weatherIcon">⛅</div>
+            </div>
+            <div class="weather-stats-row">
+              <div class="weather-stat">
+                <span class="ws-icon">💧</span>
+                <span class="ws-val" id="wHumidity">--%</span>
+                <span class="ws-label">Humidity</span>
+              </div>
+              <div class="weather-stat">
+                <span class="ws-icon">🌬️</span>
+                <span class="ws-val" id="wWind">-- km/h</span>
+                <span class="ws-label">Wind</span>
+              </div>
+              <div class="weather-stat">
+                <span class="ws-icon">🌧️</span>
+                <span class="ws-val" id="wRainfall">-- mm</span>
+                <span class="ws-label">Rainfall</span>
+              </div>
+              <div class="weather-stat">
+                <span class="ws-icon">🌡️</span>
+                <span class="ws-val" id="wPressure">-- hPa</span>
+                <span class="ws-label">Pressure</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Search bar -->
+          <div class="weather-search-wrap">
+            <div class="weather-search-box">
+              <span>🔍</span>
+              <input type="text" id="weatherSearchInput" placeholder="Search city…" class="weather-search-input" />
+              <button type="button" class="weather-search-btn" onclick="searchWeather()">Go</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="weather-right">
+          <!-- 4-Day Forecast -->
+          <div class="forecast-card">
+            <h3 class="forecast-title">📅 4-Day Forecast</h3>
+            <div id="forecastGrid" class="forecast-day-grid">
+              <p class="forecast-hint" id="forecastHint">Search a city above to see the forecast.</p>
+            </div>
+          </div>
+
+          <!-- Today's Advisory -->
+          <div class="forecast-card" id="advisoryCard" style="display:none">
+            <h3 class="forecast-title">💡 Today's Farming Advisory</h3>
+            <ul class="advisory-list" id="weatherAdvisoryList"></ul>
+          </div>
+
+          <!-- 💧 4-Day Water Schedule -->
+          <div class="forecast-card water-schedule-panel" id="waterSchedulePanel" style="display:none">
+            <div class="water-schedule-header">
+              <div>
+                <h3 class="forecast-title" style="margin:0">💧 4-Day Watering Schedule</h3>
+                <p class="water-schedule-crop-label" id="waterScheduleCropLabel">—</p>
+              </div>
+              <span class="water-schedule-badge">Next 4 Days</span>
+            </div>
+            <div class="water-day-grid" id="waterDayGrid"></div>
+            <div class="water-next-call">
+              📅 <span id="waterNextCallNote">Return after Day 4 for an updated irrigation plan.</span>
+            </div>
+          </div>
+
+          <!-- Weather info -->
+          <div class="info-card">
+            <h4 class="info-card-title">ℹ️ About Weather Data</h4>
+            <div class="info-rows">
+              <div class="info-row"><span class="ir-icon">🌐</span>
+                <div><strong>Source</strong><br />OpenWeatherMap live API</div></div>
+              <div class="info-row"><span class="ir-icon">🔄</span>
+                <div><strong>Auto-fill</strong><br />Weather fills the Recommend form automatically</div></div>
+              <div class="info-row"><span class="ir-icon">📍</span>
+                <div><strong>Tip</strong><br />Forecast updates for any searched city</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ PAGE: HISTORY / PROFILE ══════════════════════════════════════ -->
+    <div id="page-history" class="page">
+
+      <div class="page-header mobile-only">
+        <h1 class="page-title">History &amp; Insights 📜</h1>
+        <button class="header-refresh-btn" onclick="loadHistory()">↺ Refresh</button>
+      </div>
+      <div class="desktop-page-heading desktop-only" style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <h2 class="desk-page-title">History &amp; Insights 📜</h2>
+          <p class="desk-page-sub">Past recommendations and model analytics</p>
+        </div>
+        <button class="header-refresh-btn" onclick="loadHistory()">↺ Refresh</button>
+      </div>
+
+      <div class="history-layout">
+        <div class="history-main">
+          <div id="historyCards" class="history-cards-wrap">
+            <div class="empty-state-card">
+              <div class="rp-icon">📜</div>
+              <p>No history yet. Make your first recommendation!</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="history-side">
+          <div class="info-card">
+            <h4 class="info-card-title">🤖 About the AI Model</h4>
+            <div class="info-rows">
+              <div class="info-row"><span class="ir-icon">🌲</span>
+                <div><strong>Algorithm</strong><br />Random Forest Classifier</div></div>
+              <div class="info-row"><span class="ir-icon">📈</span>
+                <div><strong>Estimators</strong><br />200 decision trees</div></div>
+              <div class="info-row"><span class="ir-icon">🎯</span>
+                <div><strong>Output</strong><br />Top 5 crops with confidence scores</div></div>
+              <div class="info-row"><span class="ir-icon">💾</span>
+                <div><strong>Stack</strong><br />scikit-learn + Flask API</div></div>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <h4 class="info-card-title">📊 Feature Importance</h4>
+            <div id="featureChart" class="feature-chart-wrap">
+              <p class="muted-hint">Start the backend to view insights.</p>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <h4 class="info-card-title">🌾 Supported Crops</h4>
+            <div class="crop-chips" id="cropChips"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ BOTTOM NAV (mobile only) ═════════════════════════════════════ -->
+    <nav class="bottom-nav mobile-only" id="bottomNav">
+      <button class="nav-item active" id="nav-home"     onclick="showPage('home', this)">
+        <span class="nav-icon">🏠</span><span class="nav-label">Home</span>
+      </button>
+      <button class="nav-item" id="nav-recommend" onclick="showPage('recommend', this)">
+        <span class="nav-icon">🔍</span><span class="nav-label">Recommend</span>
+      </button>
+      <button class="nav-item" id="nav-weather" onclick="showPage('weather', this)">
+        <span class="nav-icon">⛅</span><span class="nav-label">Weather</span>
+      </button>
+      <button class="nav-item" id="nav-history" onclick="showPage('history', this)">
+        <span class="nav-icon">📜</span><span class="nav-label">History</span>
+      </button>
+    </nav>
+
+  </div><!-- /app-shell -->
+
+  <script src="js/app.js"></script>
+</body>
+</html>

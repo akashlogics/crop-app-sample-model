@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CropAI | Smart Weather Agriculture</title>
+    <style>
+        :root {
+            --primary: #1d976c;
+            --secondary: #93f9b9;
+            --glass: rgba(255, 255, 255, 0.15);
+            --border: rgba(255, 255, 255, 0.3);
+            --dark: #2d3436;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            scroll-behavior: smooth;
+            color: var(--dark);
+            background: #f0f4f3;
+        }
+
+        /* --- Navigation Bar --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 80px;
+            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            margin-left: 30px;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover { color: var(--primary); }
+
+        .btn-nav {
+            background: var(--primary);
+            color: white !important;
+            padding: 10px 25px;
+            border-radius: 50px;
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 0 20px;
+        }
+
+        .hero h1 { font-size: 3.5rem; margin-bottom: 10px; }
+        .hero p { font-size: 1.2rem; max-width: 600px; margin-bottom: 30px; opacity: 0.9; }
+
+        /* --- Common Section Styling --- */
+        section { padding: 100px 80px; text-align: center; }
+        .section-title { font-size: 2.5rem; margin-bottom: 50px; position: relative; }
+        .section-title::after {
+            content: '';
+            width: 80px;
+            height: 4px;
+            background: var(--primary);
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* --- About Section (Grid) --- */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transition: 0.3s;
+        }
+
+        .feature-card:hover { transform: translateY(-10px); }
+        .feature-card i { font-size: 3rem; color: var(--primary); margin-bottom: 20px; display: block; }
+
+        /* --- Process Section --- */
+        .process-section { background: #e9f5ef; }
+
+        /* --- Footer --- */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 50px 80px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .footer-logo h2 { color: var(--secondary); margin-bottom: 10px; }
+        .footer-links a { color: #bbb; text-decoration: none; display: block; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">🌾 CropAI</div>
+        <div class="nav-links">
+            <a href="#about">About</a>
+            <a href="#process">Process</a>
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('register') }}" class="btn-nav">Get Started</a>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <h1>Smart Farming for a Better Future</h1>
+        <p>Using real-time weather analytics and Machine Learning to help you choose the right crop and irrigation for your land.</p>
+        <a href="{{ url_for('register') }}" style="text-decoration: none; background: white; color: var(--primary); padding: 15px 40px; border-radius: 50px; font-weight: bold; font-size: 1.1rem;">Register Now</a>
+    </header>
+
+    <section id="about">
+        <h2 class="section-title">Why Choose CropAI?</h2>
+        <div class="grid-container">
+            <div class="feature-card">
+                <h3>Real-Time Weather</h3>
+                <p>We fetch current data directly from local weather stations to ensure precision.</p>
+            </div>
+            <div class="feature-card">
+                <h3>ML Recommendations</h3>
+                <p>Our Random Forest model analyzes your environment to suggest the perfect crop.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Irrigation Insight</h3>
+                <p>Save water and increase yield with specific irrigation suitability checks.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="process" class="process-section">
+        <h2 class="section-title">How It Works</h2>
+        <div class="grid-container">
+            <div class="feature-card">
+                <h1>1</h1>
+                <p>Register and Login to your personal dashboard.</p>
+            </div>
+            <div class="feature-card">
+                <h1>2</h1>
+                <p>View live weather data and enter your target crop.</p>
+            </div>
+            <div class="feature-card">
+                <h1>3</h1>
+                <p>Get instant ML-backed advice on crops and watering methods.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-logo">
+            <h2>CropAI</h2>
+            <p>Empowering farmers with data-driven technology.</p>
+        </div>
+        <div class="footer-links">
+            <h4>Quick Links</h4>
+            <a href="#">Home</a>
+            <a href="#about">About</a>
+            <a href="{{ url_for('login') }}">Login</a>
+        </div>
+        <div class="footer-copy">
+            <p>&copy; 2026 CropAI Project. Built with Flask.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

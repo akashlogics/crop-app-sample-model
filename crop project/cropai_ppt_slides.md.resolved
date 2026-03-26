@@ -1,0 +1,299 @@
+# 🌾 CropAI — Intelligent Crop Recommendation System
+## PowerPoint Presentation — Full Slide Content
+
+---
+
+## 🖼️ SLIDE 1 — Title Slide
+
+**Title:** CropAI — Intelligent Crop Recommendation System
+**Subtitle:** Empowering Farmers with AI-driven Insights
+**Details:**
+- Course / Department: [Your Department Name]
+- Team Members: [Your Names]
+- Date: March 2026
+
+---
+
+## 🖼️ SLIDE 2 — Problem Statement
+
+**Title:** The Problem
+
+### Key Points:
+- 🌍 Over 50% of farmers globally lack access to scientific crop planning tools
+- ❌ Wrong crop selection leads to poor yields and economic loss
+- 🌦️ Climate variability makes traditional knowledge unreliable
+- 🧪 Soil nutrient data is rarely translated into actionable decisions
+
+> **"Farmers need a smart, accessible system that turns soil and weather data into real crop recommendations."**
+
+---
+
+## 🖼️ SLIDE 3 — Objectives
+
+**Title:** Project Objectives
+
+| # | Objective |
+|---|-----------|
+| 1 | Predict the best crop using ML based on soil nutrients & climate |
+| 2 | Integrate real-time weather data (OpenWeatherMap API) |
+| 3 | Provide top-5 crop suggestions with confidence scores |
+| 4 | Offer farming advisories based on conditions |
+| 5 | Store history of recommendations for future reference |
+| 6 | Deliver a clean, responsive web interface |
+
+---
+
+## 🖼️ SLIDE 4 — System Architecture
+
+**Title:** System Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────┐
+│                    FRONTEND (HTML/CSS/JS)            │
+│    Input Form  │  Results Page  │  Weather  │ History│
+└────────────────────────┬────────────────────────────┘
+                         │  REST API (HTTP/JSON)
+┌────────────────────────▼────────────────────────────┐
+│               BACKEND (Flask Python API)             │
+│  /recommend  │  /weather  │  /forecast  │  /history  │
+└──────┬───────────────┬─────────────────┬────────────┘
+       │               │                  │
+  ┌────▼────┐   ┌──────▼──────┐   ┌──────▼──────┐
+  │ ML Model│   │  Weather API │   │  SQLite DB  │
+  │(Random  │   │(OpenWeather) │   │(Rec History)│
+  │ Forest) │   └─────────────┘   └─────────────┘
+  └─────────┘
+```
+
+**Tech Stack:**
+- **Frontend:** HTML5, CSS3, Vanilla JavaScript
+- **Backend:** Python 3, Flask, Flask-CORS
+- **ML:** scikit-learn (Random Forest), NumPy, joblib
+- **Database:** SQLite
+- **External API:** OpenWeatherMap
+
+---
+
+## 🖼️ SLIDE 5 — Dataset & Machine Learning Model
+
+**Title:** Data & ML Model
+
+### Dataset ([crop_data.csv](file:///d:/crop%20project/backend/data/crop_data.csv))
+- **Records:** 2,200 samples (100 per crop)
+- **Classes:** 22 crops (Rice, Maize, Cotton, Coffee, Mango, etc.)
+- **Features:** N, P, K (soil nutrients), Temperature, Humidity, pH, Rainfall
+
+### Model: Random Forest Classifier
+| Parameter | Value |
+|-----------|-------|
+| Algorithm | Random Forest |
+| Trees (n_estimators) | 200 |
+| Train/Test Split | 80% / 20% |
+| Random State | 42 |
+| Parallel Jobs | -1 (all CPU cores) |
+
+### Performance
+- ✅ Model Accuracy: **~99%** on test set
+- Outputs: **Top-5 crop predictions with probability confidence scores**
+
+---
+
+## 🖼️ SLIDE 6 — MODULE 1: Input Module
+
+**Title:** Module 1 — Input Collection
+
+### What it does:
+Gathers all agronomic and contextual data from the farmer.
+
+### Input Fields:
+| Field | Type | Description |
+|-------|------|-------------|
+| Nitrogen (N) | Number | Soil nitrogen content (mg/kg) |
+| Phosphorus (P) | Number | Soil phosphorus content |
+| Potassium (K) | Number | Soil potassium content |
+| Temperature | Number | In °C |
+| Humidity | Number | In % |
+| pH Level | Number | Soil acidity (0–14) |
+| Rainfall | Number | Annual rainfall (mm) |
+| Location | Text | City/village for weather fetch |
+| Soil Type | Dropdown | Alluvial, Black, Red, Sandy, Loamy… |
+| Irrigation Type | Dropdown | Drip, Flood, Sprinkler, Rainfed |
+| Land Size | Number | In acres |
+
+### Frontend File: [frontend/index.html](file:///d:/crop%20project/frontend/index.html)
+- Responsive form with grouped field sections
+- Auto-fetches weather when user enters location (debounced)
+
+---
+
+## 🖼️ SLIDE 7 — MODULE 2: Processing Module (ML Engine)
+
+**Title:** Module 2 — AI Processing Engine
+
+### Flow:
+```
+Input Data (7 core features)
+        │
+        ▼
+  Feature Vector: [N, P, K, Temp, Humidity, pH, Rainfall]
+        │
+        ▼
+  Random Forest Model (200 Decision Trees)
+        │
+        ▼
+  predict_proba() → Probabilities for all 22 crop classes
+        │
+        ▼
+  Top-5 Crops sorted by confidence score
+```
+
+### Key Backend Logic ([backend/app.py](file:///d:/crop%20project/backend/app.py) → `/recommend` endpoint):
+- Validates & converts all input to `float`
+- Runs `rf_model.predict_proba(features)`
+- Ranks crops using `np.argsort(proba)[::-1][:5]`
+- Enriches result with emoji, description & fertilizer recommendation
+- Calls [get_advisory()](file:///d:/crop%20project/backend/app.py#144-165) for weather-based tips
+- Calls [get_soil_advisory()](file:///d:/crop%20project/backend/app.py#167-179) for soil-specific tips
+- Saves result to SQLite via `save_recommendation()`
+
+### Also handles optional context:
+- Soil type → soil advisory
+- Irrigation type → stored in DB
+- Land size → stored in DB
+
+---
+
+## 🖼️ SLIDE 8 — MODULE 3: Output / Recommendation Module
+
+**Title:** Module 3 — Recommendation Output
+
+### What the system returns:
+
+#### Top Recommendation Card:
+| Field | Example |
+|-------|---------|
+| Crop Name | Rice 🌾 |
+| Confidence | 89.5% |
+| Description | Paddy crop, needs high water |
+| Fertilizer | Urea + DAP |
+
+#### All Recommendations (Top 5):
+- Ranked list with confidence bars
+- Each card shows: crop emoji, name, confidence %, description, fertilizer
+
+#### Advisory Tips:
+- **Weather advisories** based on Temp, Humidity & Rainfall:
+  - > 35°C → irrigation warning
+  - > 85% humidity → fungal disease warning
+  - < 50mm rainfall → irrigation recommended
+- **Soil advisories** based on soil type:
+  - Laterite → lime pH fix
+  - Sandy soil → frequent irrigation
+  - Black soil → ideal for cotton
+
+---
+
+## 🖼️ SLIDE 9 — MODULE 4: Weather Module
+
+**Title:** Module 4 — Real-Time Weather Integration
+
+### Endpoints:
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/weather?city=Mumbai` | GET | Current weather data |
+| `/forecast?city=Mumbai` | GET | 4-day weather forecast |
+
+### Current Weather Response:
+- Temperature, Humidity, Rainfall, Wind Speed, Pressure
+- Weather description & icon (☀️ ⛅ 🌧️)
+- Auto-generated farming advisory
+
+### 4-Day Forecast:
+- Groups OWM 3-hour slots by day
+- Per day: min/max temp, avg humidity, total rainfall, description
+
+### Fallback:
+- If no API key → returns **mock/demo data** so app still works for testing
+
+### Used for:
+- Auto-filling temperature, humidity, rainfall in the input form
+- Weather Advisory section on the UI
+
+---
+
+## 🖼️ SLIDE 10 — MODULE 5: History Module
+
+**Title:** Module 5 — Recommendation History
+
+### Database: [recommendations.db](file:///d:/crop%20project/backend/recommendations.db) (SQLite)
+### Schema stored by [backend/database.py](file:///d:/crop%20project/backend/database.py):
+
+| Column | Type | Description |
+|--------|------|-------------|
+| id | INTEGER | Auto-increment primary key |
+| timestamp | TEXT | ISO datetime of recommendation |
+| location | TEXT | City name |
+| soil_type | TEXT | Soil category |
+| irrigation | TEXT | Irrigation method |
+| land_size | REAL | Acres |
+| N, P, K | REAL | Nutrient values |
+| temperature | REAL | °C |
+| humidity | REAL | % |
+| ph | REAL | pH value |
+| rainfall | REAL | mm |
+| top_crop | TEXT | Best recommended crop |
+| confidence | REAL | Confidence % |
+| all_results | TEXT | JSON of top-5 results |
+
+### Endpoint: `GET /history`
+- Returns last 20 recommendations
+- Frontend renders them as full recommendation cards
+
+---
+
+## 🖼️ SLIDE 11 — API Endpoints Summary
+
+**Title:** Backend API Reference
+
+| Endpoint | Method | Input | Output |
+|----------|--------|-------|--------|
+| `/recommend` | POST | JSON: N,P,K, Temp, Humidity, pH, Rainfall, Location, Soil, Irrigation, Land size | Top crop + Top-5 list + Advisory |
+| `/weather` | GET | `?city=CityName` | Temp, Humidity, Rainfall, Wind, Pressure, Icon, Advisory |
+| `/forecast` | GET | `?city=CityName` | 4-day array: day, icon, min/max temp, humidity, rainfall |
+| `/history` | GET | — | Last 20 saved recommendations |
+| `/feature-importance` | GET | — | Feature importance scores from RF model |
+| `/health` | GET | — | API status + crop count |
+
+### Tech: Python · Flask · Flask-CORS · joblib · scikit-learn · NumPy
+
+---
+
+## 🖼️ SLIDE 12 — Conclusion & Future Scope
+
+**Title:** Conclusion & Future Work
+
+### ✅ What We Achieved:
+- AI-powered crop recommendation with ~99% accuracy
+- Real-time weather integration (live + fallback mode)
+- Soil-type and irrigation-aware advisory system
+- Persistent recommendation history
+- Clean, responsive web UI
+
+### 🔭 Future Enhancements:
+| Enhancement | Details |
+|-------------|---------|
+| 📱 Mobile App | Android/iOS using React Native or Flutter |
+| 🗺️ GPS Integration | Auto-detect location for weather fetch |
+| 📊 Soil Test Import | Upload lab reports to auto-fill N, P, K |
+| 🌐 Multilingual UI | Hindi, Tamil, Telugu support for farmers |
+| 📈 Yield Prediction | Add expected crop yield per acre |
+| 🤖 Chatbot | Voice/text assistant for queries |
+
+---
+
+> 💡 **Slide Design Tips:**
+> - Use a **green & earthy color theme** (hex: `#2d6a4f`, `#52b788`, `#fefae0`)
+> - Add crop/farm background images on title & section slides
+> - Use **progress bars** for confidence scores on the output slide
+> - Include a **live demo** screenshot on slide 8 (Output Module)
+> - Font: Use **Poppins** or **Montserrat** for a modern look

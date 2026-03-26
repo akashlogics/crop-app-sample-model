@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | CropAI</title>
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.2);
+            --border: rgba(255, 255, 255, 0.3);
+            --input-bg: rgba(255, 255, 255, 0.15);
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1d976c, #93f9b9); /* Matching Green Gradient */
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Decorative background shapes for better glass effect */
+        body::before {
+            content: "";
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: 10%;
+            left: 20%;
+            z-index: -1;
+        }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--border);
+            border-radius: 25px;
+            padding: 40px;
+            width: 450px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+            color: white;
+        }
+
+        h2 {
+            margin-top: 0;
+            font-weight: 600;
+            text-align: center;
+            letter-spacing: 1px;
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        /* Style for readonly inputs to look distinct but clean */
+        input[readonly] {
+            background: rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: not-allowed;
+            color: #e0e0e0;
+        }
+
+        /* Style for the user input field */
+        input[name="user_crop"] {
+            background: rgba(255, 255, 255, 0.9);
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        input[name="user_crop"]::placeholder {
+            color: #7f8c8d;
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.2);
+            margin: 10px 0 25px 0;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            background: #38ef7d;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #2ecc71;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glass-card">
+        <h2>🌾 Crop Prediction</h2>
+        
+        <form action="/predict" method="POST">
+            <label>Current Temperature (°C)</label>
+            <input type="text" name="temp" value="{{ temp }}" readonly>
+            
+            <label>Current Humidity (%)</label>
+            <input type="text" name="hum" value="{{ hum }}" readonly>
+            
+            <label>Current Rainfall (mm)</label>
+            <input type="text" name="rain" value="{{ rain }}" readonly>
+            
+            <hr>
+            
+            <label>What crop do you plan to grow?</label>
+            <input type="text" name="user_crop" placeholder="e.g. Rice, Cotton, Maize" required>
+            
+            <button type="submit">Predict Suitability</button>
+        </form>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | CropAI</title>
+    <style>
+        :root { 
+            --glass: rgba(255, 255, 255, 0.2); 
+            --border: rgba(255, 255, 255, 0.3); 
+            --input-focus: rgba(255, 255, 255, 0.8);
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #1d976c 0%, #93f9b9 100%); 
+            height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Subtle background decoration for glass depth */
+        body::before {
+            content: "";
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: 15%;
+            right: 20%;
+            z-index: -1;
+        }
+
+        .glass-card { 
+            background: var(--glass); 
+            backdrop-filter: blur(15px); 
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--border); 
+            border-radius: 25px; 
+            padding: 50px 40px; 
+            width: 380px; 
+            color: #fff; 
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15); 
+            text-align: center; 
+        }
+
+        h2 { 
+            margin-bottom: 30px; 
+            font-weight: 600; 
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-size: 1.5rem;
+        }
+
+        input { 
+            width: 100%; 
+            padding: 14px; 
+            margin: 12px 0; 
+            border-radius: 12px; 
+            border: 1px solid var(--border); 
+            background: rgba(255, 255, 255, 0.4); 
+            color: #2c3e50;
+            outline: none; 
+            box-sizing: border-box; 
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        input::placeholder {
+            color: #555;
+        }
+
+        input:focus {
+            background: var(--input-focus);
+            border-color: #fff;
+            box-shadow: 0 0 10px rgba(255,255,255,0.2);
+        }
+
+        button { 
+            width: 100%; 
+            padding: 14px; 
+            margin-top: 20px;
+            border: none; 
+            border-radius: 12px; 
+            background: #2d3436; 
+            color: white; 
+            font-weight: bold; 
+            font-size: 1rem;
+            cursor: pointer; 
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        button:hover { 
+            background: #000; 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .alert { 
+            background: rgba(217, 83, 79, 0.2);
+            color: #fff; 
+            font-size: 0.9em; 
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(217, 83, 79, 0.3);
+        }
+
+        p {
+            margin-top: 25px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            border-bottom: 1px dashed #fff;
+            padding-bottom: 2px;
+            transition: 0.3s;
+        }
+
+        a:hover {
+            color: #2d3436;
+            border-bottom-color: transparent;
+        }
+    </style>
+</head>
+<body>
+    <div class="glass-card">
+        <h2>Welcome Back</h2>
+        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Log In</button>
+        </form>
+        
+        <p>New farmer? <a href="{{ url_for('register') }}">Create Account</a></p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Recommendation | CropAI</title>
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.25);
+            --border: rgba(255, 255, 255, 0.3);
+            /* Soft glows for status */
+            --success-glow: rgba(76, 175, 80, 0.3);
+            --warning-glow: rgba(255, 152, 0, 0.3);
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1d976c, #93f9b9);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            color: #2c3e50;
+        }
+
+        /* Decorative Background element */
+        body::after {
+            content: "";
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            bottom: -10%;
+            right: 10%;
+            z-index: -1;
+        }
+
+        .final-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            padding: 50px 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 1.8rem;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+        }
+
+        .message-container {
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* Status Classes matching your Flask logic */
+        .success { 
+            background: rgba(255, 255, 255, 0.4); 
+            color: #1b5e20;
+            box-shadow: inset 0 0 20px var(--success-glow);
+        }
+        
+        .warning { 
+            background: rgba(255, 255, 255, 0.4); 
+            color: #7d5a00;
+            box-shadow: inset 0 0 20px var(--warning-glow);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 35px;
+            background: #2d3436;
+            color: white;
+            text-decoration: none;
+            border-radius: 15px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover {
+            background: #000;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+        .water-info {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: left;
+        }
+
+        .water-badge {
+            display: inline-block;
+            background: #0984e3;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .schedule-title {
+            font-size: 1rem;
+            color: white;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="final-card">
+        <span class="icon">
+            {% if status == 'success' %} ✅ {% else %} 💡 {% endif %}
+        </span>
+        <h2>Irrigation Analysis</h2>
+        
+        <div class="message-container {{ status }}">
+            {{ message }}
+        </div>
+
+        <div class="water-info">
+            <div class="schedule-title">📅 7-Day Water Schedule</div>
+            <p style="color: rgba(102, 102, 102, 0.9); font-size: 0.9rem; margin: 10px 0;">
+                Based on current high temperatures and low rainfall predictions for your <strong>{{ crop.capitalize() }}</strong>:
+            </p>
+            <div class="water-badge">
+                Recommended: {{ water_qty }} Liters / m² per week
+            </div>
+            <p style="font-size: 0.8rem; color: rgba(98, 98, 98, 0.7); margin-top: 10px;">
+                *Adjust frequency if soil moisture appears high.
+            </p>
+        </div>
+
+        <br>
+        <a href="/dashboard" class="btn">Start New Analysis</a>
+    </div>
+</body>
+</html>
